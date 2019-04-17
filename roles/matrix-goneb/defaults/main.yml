@@ -1,129 +1,93 @@
 matrix_goneb_enabled: false
 
-# You are required to specify an access token for Dimension to work.
-# For information on how to acquire an access token, visit https://t2bot.io/docs/access_tokens
-matrix_dimension_access_token: ""
+matrix_goneb_base_path: "{{ matrix_base_data_path }}/goneb"
 
-# Users in form: ['@user1:domain.com', '@user2:domain.com']
-matrix_dimension_admins: []
-
-# Whether to allow Dimension widgets serve websites with invalid or self signed SSL certificates
-matrix_dimension_widgets_allow_self_signed_ssl_certificates: false
-
-matrix_dimension_base_path: "{{ matrix_base_data_path }}/goneb"
-
+# there are currently no tagged images, but in the future this should be fixed on the current known-good image
 matrix_goneb_docker_image: "docker.io/matrixdotorg/go-neb:latest"
 
-# The user and group id correspond to the node user in the `turt2live/matrix-dimension` image.
-matrix_dimension_user_uid: 1000
-matrix_dimension_user_gid: 1000
-
 matrix_goneb_container_expose_port: false
+# port that the container should bind to
+matrix_goneb_container_port: 4050
+# URL which is publicly available and where (f.ex. from github) webhooks get sent to
+matrix_goneb_container_public_url: "http://goneb.{{ matrix_domain }}"
 
-matrix_dimension_integrations_ui_url: "https://{{ matrix_server_fqn_dimension }}/riot"
-matrix_dimension_integrations_rest_url: "https://{{ matrix_server_fqn_dimension }}/api/v1/scalar"
-matrix_dimension_integrations_widgets_urls: ["https://{{ matrix_server_fqn_dimension }}/widgets"]
-matrix_dimension_integrations_jitsi_widget_url: "https://{{ matrix_server_fqn_dimension }}/widgets/jitsi"
+matrix_goneb_config_file_url: "{{ matirx_goneb_base_path }}/config.yaml"
 
-# Default Dimension configuration template which covers the generic use case.
-# You can customize it by controlling the various variables inside it.
+# no other type is currently supported!
+matrix_goneb_db_type: "sqlite3"
+matrix_goneb_db_url: "/data/go-neb.db?_busy_timeout=5000"
+
+# Default Go-NEB configuration template, smaller version of go-neb's example config file.
+# You can customize it by controlling the various variables inside it, for examples look on github:
+# https://github.com/matrix-org/go-neb/blob/master/config.sample.yaml
 #
-# For a more advanced customization, you can extend the default (see `matrix_dimension_configuration_extension_yaml`)
+# For a more advanced customization, you can extend the default (see `matrix_goneb_configuration_extension_yaml`)
 # or completely replace this variable with your own template.
-matrix_dimension_configuration_yaml: |
-  # The web settings for the service (API and UI).
-  # It is best to have this run on localhost and use a reverse proxy to access Dimension.
-  web:
-    port: 8184
-    address: '0.0.0.0'
-
-  # Homeserver configuration
-  homeserver:
-    # The domain name of the homeserver. This is used in many places, such as with go-neb
-    # setups, to identify the homeserver.
-    name: "{{ matrix_domain }}"
-
-    # The URL that Dimension, go-neb, and other services provisioned by Dimension should
-    # use to access the homeserver with.
-    clientServerUrl: "http://matrix-synapse:8008"
-
-    # The URL that Dimension should use when trying to communicate with federated APIs on
-    # the homeserver. If not supplied or left empty Dimension will try to resolve the address
-    # through the normal federation process.
-    federationUrl: "http://matrix-synapse:8048"
-
-    # The URL that Dimension will redirect media requests to for downloading media such as
-    # stickers. If not supplied or left empty Dimension will use the clientServerUrl.
-    mediaUrl: "https://{{ matrix_server_fqn_matrix }}"
-
-    # The access token Dimension should use for miscellaneous access to the homeserver. This
-    # should be for a user on the configured homeserver: any user will do, however it is
-    # recommended to use a dedicated user (such as @dimension:t2bot.io). For information on
-    # how to acquire an access token, visit https://t2bot.io/docs/access_tokens
-    accessToken: "{{ matrix_dimension_access_token }}"
-
-  # These users can modify the integrations this Dimension supports.
-  # To access the admin interface, open Dimension in Riot and click the settings icon.
-  admins: {{ matrix_dimension_admins|to_json }}
-
-  # IPs and CIDR ranges listed here will be blocked from being widgets.
-  # Note: Widgets may still be embedded with restricted content, although not through Dimension directly.
-  widgetBlacklist:
-    - 10.0.0.0/8
-    - 172.16.0.0/12
-    - 192.168.0.0/16
-    - 127.0.0.0/8
-
-  # Where the database for Dimension is
-  database:
-    file: "dimension.db"
-
-  # Display settings that apply to self-hosted go-neb instances
-  goneb:
-    # The avatars to set for each bot. Usually these don't need to be changed, however if your homeserver
-    # is not able to reach t2bot.io then you should specify your own here. To not use an avatar for a bot,
-    # make the bot's avatar an empty string.
-    avatars:
-      giphy: "mxc://t2bot.io/c5eaab3ef0133c1a61d3c849026deb27"
-      imgur: "mxc://t2bot.io/6749eaf2b302bb2188ae931b2eeb1513"
-      github: "mxc://t2bot.io/905b64b3cd8e2347f91a60c5eb0832e1"
-      wikipedia: "mxc://t2bot.io/7edfb54e9ad9e13fec0df22636feedf1"
-      travisci: "mxc://t2bot.io/7f4703126906fab8bb27df34a17707a8"
-      rss: "mxc://t2bot.io/aace4fcbd045f30afc1b4e5f0928f2f3"
-      google: "mxc://t2bot.io/636ad10742b66c4729bf89881a505142"
-      guggy: "mxc://t2bot.io/e7ef0ed0ba651aaf907655704f9a7526"
-      echo: "mxc://t2bot.io/3407ff2db96b4e954fcbf2c6c0415a13"
-      circleci: "mxc://t2bot.io/cf7d875845a82a6b21f5f66de78f6bee"
-      jira: "mxc://t2bot.io/f4a38ebcc4280ba5b950163ca3e7c329"
-
-  # Settings for controlling how logging works
-  logging:
-    file: /dev/null
-    console: true
-    consoleLevel: verbose
-    fileLevel: info
-    rotate:
-      size: 52428800 # bytes, default is 50mb
-      count: 5
-
+matrix_goneb_configuration_yaml: |
+  clients:
+    - UserID: "@goneb:{{ matrix_domain }}"
+      AccessToken: "YOUR_ACCESS_TOKEN_HERE"
+      HomeserverURL: "http://matrix-synapse:8008"
+      Sync: true
+      AutoJoinRooms: true
+      DisplayName: "Go-NEB!"
+    - UserID: "@another_goneb_bot:localhost:{{ matrix_domain }}"
+      AccessToken: "NEXT_ACCESS_TOKEN_HERE"
+      HomeserverURL: "http:/matrix-synapse:8008"
+      # Sync may be false for services which only send events _to_ matrix but never need to listen to them
+      Sync: false
+      AutoJoinRooms: false
+      DisplayName: "Go-NEB!, but a second one!"
+  realms:
+    - ID: "github_realm"
+      Type: "github"
+      Config: {}
+  sessions:
+    - SessionID: "your_github_session"
+      RealmID: "github_realm"
+      UserID: "@YOUR_USER_ID:localhost"
+      Config:
+        # Populate these fields by generating a "Personal Access Token" on github.com
+        AccessToken: "YOUR_GITHUB_ACCESS_TOKEN"
+        Scopes: "admin:org_hook,admin:repo_hook,repo,user"
+  services:
+    - ID: "giphy_service"
+      Type: "giphy"
+      UserID: "@goneb:localhost" # requires a Syncing client
+      Config:
+        api_key: "qwg4672vsuyfsfe"
+        use_downsized: false
+    - ID: "imgur_service"
+      Type: "imgur"
+      UserID: "@imgur:localhost" # requires a Syncing client
+      Config:
+        api_key: "AIzaSyA4FD39m9"
+    - ID: "wikipedia_service"
+      Type: "wikipedia"
+      UserID: "@goneb:localhost" # requires a Syncing client
+      Config:
+    - ID: "rss_service"
+      Type: "rssbot"
+      UserID: "@another_goneb:localhost"
+      Config:
+        feeds:
+          "http://lorem-rss.herokuapp.com/feed?unit=second&interval=60": rooms: ["!qmElAGdFYCHoCJuaNt:{{  matrix_domain }}"]
 
 matrix_dimension_configuration_extension_yaml: |
-  # Your custom YAML configuration for Dimension goes here.
-  # This configuration extends the default starting configuration (`matrix_dimension_configuration_yaml`).
+  # Your custom YAML configuration for Go-NEB goes here.
+  # This configuration extends the default starting configuration (`matrix_goneb_configuration_yaml`).
   #
   # You can override individual variables from the default configuration, or introduce new ones.
+  # For usage examples, see https://github.com/matrix-org/go-neb/blob/master/config.sample.yaml
   #
   # If you need something more special, you can take full control by
-  # completely redefining `matrix_dimension_configuration_yaml`.
-  #
-  # Example configuration extension follows:
-  # telegram:
-  #   botToken: "YourTokenHere"
+  # completely redefining `matrix_goneb_configuration_yaml`.
   #
 
 
-# Holds the final Dimension configuration (a combination of the default and its extension).
-# You most likely don't need to touch this variable. Instead, see `matrix_dimension_configuration_yaml`.
-matrix_dimension_configuration: "{{ matrix_dimension_configuration_yaml|from_yaml|combine(matrix_dimension_configuration_extension, recursive=True) }}"
+# Holds the final Go-NEB configuration (a combination of the default and its extension).
+# You most likely don't need to touch this variable. Instead, see `matrix_goneb_configuration_extension_yaml`.
+matrix_goneb_configuration: "{{ matrix_goneb_configuration_yaml|from_yaml|combine(matrix_goneb_configuration_extension, 
+recursive=True) }}"
 
 
