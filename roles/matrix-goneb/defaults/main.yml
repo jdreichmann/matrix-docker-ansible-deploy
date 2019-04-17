@@ -9,9 +9,9 @@ matrix_goneb_container_expose_port: false
 # port that the container should bind to
 matrix_goneb_container_port: 4050
 # URL which is publicly available and where (f.ex. from github) webhooks get sent to
-matrix_goneb_container_public_url: "http://goneb.{{ matrix_domain }}"
+matrix_goneb_container_public_url: "http://{{ matrix_server_fqn_goneb }}"
 
-matrix_goneb_config_file_url: "{{ matirx_goneb_base_path }}/config.yaml"
+matrix_goneb_config_file_url: "{{ matrix_goneb_base_path }}/config.yaml"
 
 # no other type is currently supported!
 matrix_goneb_db_type: "sqlite3"
